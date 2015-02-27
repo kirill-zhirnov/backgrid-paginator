@@ -219,7 +219,6 @@
      @class Backgrid.Extension.Paginator
   */
   var Paginator = Backgrid.Extension.Paginator = Backbone.View.extend({
-
     /** @property */
     className: "backgrid-paginator",
 
@@ -278,6 +277,11 @@
     goBackFirstOnSort: true,
 
     /**
+     * @property {Backbone.View} pageSizeSelector. Instance of Backbone.View.
+     */
+    pageSizeSelector: null,
+
+    /**
        Initializer.
 
        @param {Object} options
@@ -293,15 +297,15 @@
 
       _.extend(self, _.pick(options || {}, "windowSize", "pageHandle",
                             "slideScale", "goBackFirstOnSort",
-                            "renderIndexedPageHandles"));
+                            "renderIndexedPageHandles", "pageSizeSelector"));
 
       var col = self.collection;
       self.listenTo(col, "add", self.render);
       self.listenTo(col, "remove", self.render);
       self.listenTo(col, "reset", self.render);
-	  self.listenTo(col, "backgrid:beforeSort", function() {
-		  if (self.goBackFirstOnSort) col.state.currentPage = col.state.firstPage;
-	  });
+      self.listenTo(col, "backgrid:beforeSort", function() {
+        if (self.goBackFirstOnSort) col.state.currentPage = col.state.firstPage;
+      });
     },
 
     /**
@@ -425,9 +429,100 @@
 
       this.el.appendChild(ul);
 
+      if (this.pageSizeSelector) {
+        if (!(this.pageSizeSelector instanceof Backbone.View)) {
+          throw new Error("pageSizeSelector must be instance of Backbone.View");
+        }
+
+        this.el.appendChild(this.pageSizeSelector.render().el);
+      }
+
       return this;
     }
 
   });
 
+  Backgrid.Extension.PageSizeSelector = Backbone.View.extend({
+    className : "page-size-selector",
+
+    /**
+     * @property {Object} pageSizeOptions If specified - show dropdown with page size options.
+     */
+    pageSizeOptions: {},
+
+    /**
+     * @property {string} label If specified - show label near the dropdown.
+     */
+    label : null,
+
+    /**
+     * @property {Object} $select jQuery instance of <select/>
+     */
+    $select : null,
+
+    initialize: function (options) {
+      options || (options = {});
+
+      _.extend(this, _.pick(options, ['pageSizeOptions', 'label']));
+
+      if (!this.collection || !(this.collection instanceof Backbone.PageableCollection))
+        throw new Error('You must pass a collection and collection must be instance of Backbone.PageableCollection.');
+    },
+
+    events: {
+      "change select": "changePageSize"
+    },
+
+    render : function() {
+      this.$el.empty();
+
+      var label = $('<label></label>');
+
+      if (this.label) {
+        label.text(this.label);
+      }
+
+      this.createSelect()
+      label.append(this.$select);
+      this.$el.append(label);
+
+      this.delegateEvents();
+
+      return this;
+    },
+
+    createSelect : function() {
+      var self = this;
+      this.$select = $('<select></select>');
+
+      _.each(this.pageSizeOptions, function(label, value) {
+        var option = $('<option></option>');
+        option.text(label);
+        option.attr('value', value);
+
+        if (
+            (self.collection.state.pageSize !== false && self.collection.state.pageSize == value)
+            ||
+            (self.collection.state.pageSize === false && value === 'all')
+        ){
+          option.prop('selected', true);
+        }
+
+        self.$select.append(option);
+      });
+    },
+
+    changePageSize : function() {
+      var pageSize = false,
+        val = this.$select.val();
+
+      if (val !== 'all') {
+        pageSize = parseInt(val);
+      }
+
+      this.collection.state.currentPage = this.collection.state.firstPage;
+      this.collection.state.pageSize = pageSize;
+      this.collection.fetch({reset:true});
+    }
+  });
 }));
