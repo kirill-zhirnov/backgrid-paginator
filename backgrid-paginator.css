@@ -64,3 +64,19 @@
   right: 0;
   display: inline-block;
 }
+
+.backgrid-paginator .stat {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  display: inline-block;
+}
+
+.backgrid-paginator .stat span + span {
+  margin-left: 10px;
+}
+
+.backgrid-paginator .stat span > b {
+  display: inline-block;
+  margin-right: 5px;
+}

@@ -283,6 +283,11 @@
 
     collectionEventsToReRender : ['sync'],
 
+    titles : {
+      totalRecords : 'Total items:',
+      totalPages : 'Total pages:'
+    },
+
     /**
        Initializer.
 
@@ -299,7 +304,7 @@
 
       _.extend(self, _.pick(options || {}, "windowSize", "pageHandle",
                             "slideScale", "goBackFirstOnSort",
-                            "renderIndexedPageHandles", "pageSizeSelector"));
+                            "renderIndexedPageHandles", "pageSizeSelector", "titles"));
 
       var col = self.collection;
 
@@ -424,8 +429,9 @@
         }
       }
 
-      var handles = this.handles = this.makeHandles();
+      this.$el.append(this.createStatEl());
 
+      var handles = this.handles = this.makeHandles();
       var ul = document.createElement("ul");
       for (var i = 0; i < handles.length; i++) {
         ul.appendChild(handles[i].render().el);
@@ -442,6 +448,22 @@
       }
 
       return this;
+    },
+
+    createStatEl : function() {
+      var $el = $('<div class="stat"></div>');
+
+      //total records:
+      if (this.titles.totalRecords) {
+        $el.append('<span><b>' + this.titles.totalRecords + '</b>' + this.collection.state.totalRecords + '</span>');
+      }
+
+      //total pages:
+      if (this.collection.state.totalPages) {
+        $el.append('<span><b>' + this.titles.totalPages + '</b>' + this.collection.state.totalPages + '</span>');
+      }
+
+      return $el;
     }
 
   });
