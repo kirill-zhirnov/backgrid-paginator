@@ -454,7 +454,7 @@
       var $el = $('<div class="stat"></div>');
 
       //total records:
-      if (this.titles.totalRecords) {
+      if (this.collection.state.totalRecords) {
         $el.append('<span><b>' + this.titles.totalRecords + '</b>' + this.collection.state.totalRecords + '</span>');
       }
 
