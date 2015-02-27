@@ -279,7 +279,9 @@
     /**
      * @property {Backbone.View} pageSizeSelector. Instance of Backbone.View.
      */
-    pageSizeSelector: null,
+    pageSizeSelector : null,
+
+    collectionEventsToReRender : ['sync'],
 
     /**
        Initializer.
@@ -300,9 +302,11 @@
                             "renderIndexedPageHandles", "pageSizeSelector"));
 
       var col = self.collection;
-      self.listenTo(col, "add", self.render);
-      self.listenTo(col, "remove", self.render);
-      self.listenTo(col, "reset", self.render);
+
+      _.each(this.collectionEventsToReRender, function(eventName) {
+        self.listenTo(col, eventName, self.render);
+      });
+
       self.listenTo(col, "backgrid:beforeSort", function() {
         if (self.goBackFirstOnSort) col.state.currentPage = col.state.firstPage;
       });
