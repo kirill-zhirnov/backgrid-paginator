@@ -472,9 +472,9 @@
     className : "page-size-selector",
 
     /**
-     * @property {Object} pageSizeOptions If specified - show dropdown with page size options.
+     * @property {Object} options If specified - show dropdown with page size options.
      */
-    pageSizeOptions: {},
+    options: {},
 
     /**
      * @property {string} label If specified - show label near the dropdown.
@@ -489,7 +489,7 @@
     initialize: function (options) {
       options || (options = {});
 
-      _.extend(this, _.pick(options, ['pageSizeOptions', 'label']));
+      _.extend(this, _.pick(options, ['options', 'label']));
 
       if (!this.collection || !(this.collection instanceof Backbone.PageableCollection))
         throw new Error('You must pass a collection and collection must be instance of Backbone.PageableCollection.');
@@ -521,7 +521,7 @@
       var self = this;
       this.$select = $('<select></select>');
 
-      _.each(this.pageSizeOptions, function(label, value) {
+      _.each(this.options, function(label, value) {
         var option = $('<option></option>');
         option.text(label);
         option.attr('value', value);
