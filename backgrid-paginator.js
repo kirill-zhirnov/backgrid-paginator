@@ -429,8 +429,6 @@
         }
       }
 
-      this.$el.append(this.createStatEl());
-
       var handles = this.handles = this.makeHandles();
       var ul = document.createElement("ul");
       for (var i = 0; i < handles.length; i++) {
@@ -439,12 +437,16 @@
 
       this.el.appendChild(ul);
 
-      if (this.pageSizeSelector) {
+      var $infoEl = $('<div class="info"></div>');
+      $infoEl.append(this.createStatEl());
+      this.$el.append($infoEl);
+
+      if (this.pageSizeSelector && this.pageSizeSelector.shouldRender()) {
         if (!(this.pageSizeSelector instanceof Backbone.View)) {
           throw new Error("pageSizeSelector must be instance of Backbone.View");
         }
 
-        this.el.appendChild(this.pageSizeSelector.render().el);
+        $infoEl.append(this.pageSizeSelector.render().el);
       }
 
       return this;
@@ -471,6 +473,8 @@
   Backgrid.Extension.PageSizeSelector = Backbone.View.extend({
     className : "page-size-selector",
 
+    selectClassName : "",
+
     /**
      * @property {Object} options If specified - show dropdown with page size options.
      */
@@ -489,7 +493,7 @@
     initialize: function (options) {
       options || (options = {});
 
-      _.extend(this, _.pick(options, ['options', 'label']));
+      _.extend(this, _.pick(options, ['options', 'label', 'selectClassName']));
 
       if (!this.collection || !(this.collection instanceof Backbone.PageableCollection))
         throw new Error('You must pass a collection and collection must be instance of Backbone.PageableCollection.');
@@ -502,17 +506,19 @@
     render : function() {
       this.$el.empty();
 
-      var label = $('<label></label>');
+      if (this.shouldRender()) {
+        var label = $('<label></label>');
 
-      if (this.label) {
-        label.text(this.label);
+        if (this.label) {
+          label.text(this.label);
+        }
+
+        this.createSelect()
+        label.append(this.$select);
+        this.$el.append(label);
+
+        this.delegateEvents();
       }
-
-      this.createSelect()
-      label.append(this.$select);
-      this.$el.append(label);
-
-      this.delegateEvents();
 
       return this;
     },
@@ -520,6 +526,10 @@
     createSelect : function() {
       var self = this;
       this.$select = $('<select></select>');
+      console.log(this.selectClassName);
+      if (this.selectClassName) {
+        this.$select.addClass(this.selectClassName);
+      }
 
       _.each(this.options, function(label, value) {
         var option = $('<option></option>');
@@ -549,6 +559,14 @@
       this.collection.state.currentPage = this.collection.state.firstPage;
       this.collection.state.pageSize = pageSize;
       this.collection.fetch({reset:true});
+    },
+
+    shouldRender : function() {
+      if (!this.options || _.size(this.options) == 0) {
+        return false;
+      }
+
+      return true;
     }
   });
 }));

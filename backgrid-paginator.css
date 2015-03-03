@@ -7,7 +7,6 @@
 */
 
 .backgrid-paginator {
-  position: relative;
   text-align: center;
   border-top: none;
   -webkit-border-radius: 0 0 4px 4px;
@@ -56,6 +55,10 @@
 .backgrid-paginator ul > .disabled > a:hover {
   color: #999999;
   cursor: default;
+}
+
+.backgrid-paginator .info {
+  position: relative;
 }
 
 .backgrid-paginator .page-size-selector {
