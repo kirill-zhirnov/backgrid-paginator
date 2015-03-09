@@ -58,21 +58,21 @@
 }
 
 .backgrid-paginator .info {
-  position: relative;
+  margin-top: 10px;
+}
+
+.backgrid-paginator .info:after {
+  display: table;
+  clear: both;
+  content: "";
 }
 
 .backgrid-paginator .page-size-selector {
-  position: absolute;
-  top: 10px;
-  right: 0;
-  display: inline-block;
+  float: right;
 }
 
 .backgrid-paginator .stat {
-  position: absolute;
-  top: 10px;
-  left: 0;
-  display: inline-block;
+  float: left;
 }
 
 .backgrid-paginator .stat span + span {

@@ -526,7 +526,7 @@
     createSelect : function() {
       var self = this;
       this.$select = $('<select></select>');
-      
+
       if (this.selectClassName) {
         this.$select.addClass(this.selectClassName);
       }
